@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "version": "0.6.0",
+  "archive": "tar.xz",
+  "sha256": "b9c6a2875da83736885e92ab0e64715c03552ab56e2c494c01689116b6cc7aa0",
+  "segments": 7,
+  "sourceFiles": 73,
+  "documentationImagesNotIncluded": 2
+}
