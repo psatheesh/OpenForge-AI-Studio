@@ -1,0 +1,26 @@
+name: OpenForge Windows one-click installer
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+jobs:
+  windows-installer:
+    runs-on: windows-2022
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build setup executable with private Node and Yarn toolchain
+        shell: pwsh
+        run: ./installer/windows/build-installer.ps1
+      - name: Verify generated installer checksum and silent installation
+        shell: pwsh
+        run: ./installer/windows/smoke-installer.ps1
+      - name: Upload unsigned Windows setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpenForge-AI-Studio-Windows-One-Click
+          path: |
+            dist/OpenForge-AI-Studio-Setup-*.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
