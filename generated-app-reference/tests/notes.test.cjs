@@ -1,0 +1,5 @@
+'use strict';const test=require('node:test');const assert=require('node:assert/strict');const{createStore}=require('../notes.js');
+function storage(){const m=new Map();return{getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,v)}}
+test('create, search and delete notes',()=>{const s=createStore(storage());const a=s.add('Pump calculations','Flow 1250 gpm');assert.equal(s.list().length,1);assert.equal(s.list('pump').length,1);assert.equal(s.list('NOTFOUND').length,0);assert.equal(s.remove(a.id),true);assert.equal(s.list().length,0)});
+test('notes persist across store instances',()=>{const memory=storage();createStore(memory).add('Offline','Runs without network');assert.equal(createStore(memory).list()[0].title,'Offline')});
+test('reject empty notes',()=>{const s=createStore(storage());assert.throws(()=>s.add('','content'));assert.throws(()=>s.add('title',''))});

@@ -1,0 +1,5 @@
+'use strict';
+/* Independently testable model, shared by the renderer and acceptance tests. */
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.OpenForgeNotes=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  function createStore(storage){const key='openforge-notes-v1';const read=()=>{let v;try{v=JSON.parse(storage.getItem(key)||'[]')}catch{v=[]}return Array.isArray(v)?v:[]};const save=items=>storage.setItem(key,JSON.stringify(items));return {list(query=''){const q=String(query).toLowerCase();return read().filter(n=>n.title.toLowerCase().includes(q)||n.text.toLowerCase().includes(q))},add(title,text){title=String(title||'').trim();text=String(text||'').trim();if(!title||!text)throw Error('Title and content are required');const item={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),title,text,created:new Date().toISOString()};save([item,...read()]);return item},remove(id){const before=read();save(before.filter(n=>n.id!==id));return before.length!==read().length}};}
+  return{createStore};});

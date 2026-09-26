@@ -1,0 +1,40 @@
+{
+  "name": "openforge-ai-studio-unified",
+  "private": true,
+  "version": "0.6.0",
+  "description": "One Theia AI IDE product with a built-in OpenForge software builder and companion project engine",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "applications/*",
+    "packages/openforge-product"
+  ],
+  "scripts": {
+    "build:product": "yarn workspace @openforge/product build",
+    "build:browser": "yarn build:product && yarn workspace @openforge/browser build",
+    "build:desktop": "yarn build:product && yarn workspace @openforge/desktop build",
+    "start:browser": "node scripts/launch.js browser",
+    "start:desktop": "node scripts/launch.js desktop",
+    "start:builder": "node packages/openforge-workbench/server.js",
+    "test": "node --test tests/*.test.cjs && node --test packages/openforge-product/tests/*.test.cjs && node --test packages/openforge-workbench/tests/*.test.js && node --test packages/openforge-workbench/pipeline/tests/*.test.cjs",
+    "check": "node --check scripts/launch.js && node --check packages/openforge-workbench/server.js && node --check packages/openforge-workbench/public/app.js && node --check packages/openforge-workbench/zip-export.js && node --check packages/openforge-workbench/pipeline/engine.js && node --check packages/openforge-workbench/pipeline/provider-client.js && node --check packages/openforge-workbench/pipeline/desktop-wrapper.js && node --check packages/openforge-workbench/pipeline/attest.cjs",
+    "package:windows": "yarn build:desktop && electron-builder --win nsis",
+    "package:linux": "yarn build:desktop && electron-builder --linux AppImage",
+    "package:mac": "yarn build:desktop && electron-builder --mac dmg",
+    "build:desktop:production": "yarn build:product && yarn workspace @openforge/desktop build:production",
+    "installer:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File installer/windows/build-installer.ps1",
+    "verify:release": "node --test tests/*.test.cjs && node --check scripts/electron-entry.cjs && node --check scripts/first-run.cjs && node --check packages/openforge-workbench/server.js",
+    "test:installer": "node --test tests/installer.test.cjs tests/oneclick.test.cjs",
+    "verify:release:source": "node scripts/release-gates.cjs",
+    "pipeline:sample:web": "node packages/openforge-workbench/pipeline/cli.js sample --target web --approve-execution",
+    "pipeline:sample:windows": "node packages/openforge-workbench/pipeline/cli.js sample --target windows --approve-execution"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12"
+  }
+}

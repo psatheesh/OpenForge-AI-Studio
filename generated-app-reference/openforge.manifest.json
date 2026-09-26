@@ -1,0 +1,31 @@
+{
+  "name": "OpenForge Notes",
+  "template": "web",
+  "platforms": [
+    "Windows",
+    "Web"
+  ],
+  "generation": "deterministic-acceptance-fixture",
+  "requirements": [
+    {
+      "id": "R-001",
+      "text": "Create and persist notes offline",
+      "test": "tests/notes.test.cjs"
+    },
+    {
+      "id": "R-002",
+      "text": "Search notes",
+      "test": "tests/notes.test.cjs"
+    },
+    {
+      "id": "R-003",
+      "text": "Delete notes",
+      "test": "tests/notes.test.cjs"
+    },
+    {
+      "id": "R-004",
+      "text": "Install and run without separate Node.js or Yarn",
+      "test": "installer/windows/accept-generated-app.ps1"
+    }
+  ]
+}

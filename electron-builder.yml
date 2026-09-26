@@ -1,0 +1,49 @@
+appId: studio.openforge.ai
+productName: OpenForge AI Studio
+artifactName: OpenForge-AI-Studio-Setup-${version}-${arch}.${ext}
+directories:
+  output: dist
+asar: true
+asarUnpack:
+  - '**/*.node'
+  - '**/node-pty/**'
+files:
+  - scripts/electron-entry.cjs
+  - scripts/first-run.cjs
+  - applications/desktop/lib/**/*
+  - applications/desktop/package.json
+  - packages/openforge-workbench/server.js
+  - packages/openforge-workbench/zip-export.js
+  - packages/openforge-workbench/pipeline/**/*
+  - packages/openforge-workbench/public/**/*
+  - packages/openforge-product/lib/**/*
+  - node_modules/**/*
+  - package.json
+extraResources:
+  - from: installer/runtime/node
+    to: runtime/node
+    filter:
+      - '**/*'
+  - from: installer/offline
+    to: offline
+    filter:
+      - '**/*'
+extraMetadata:
+  main: scripts/electron-entry.cjs
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+nsis:
+  oneClick: true
+  perMachine: false
+  allowElevation: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  uninstallDisplayName: OpenForge AI Studio
+linux:
+  target: AppImage
+mac:
+  target: dmg

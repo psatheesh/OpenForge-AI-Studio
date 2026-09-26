@@ -1,0 +1,39 @@
+{
+  "name": "@openforge/product",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Bundled OpenForge product capabilities for the unified Theia IDE",
+  "license": "MIT",
+  "theiaExtensions": [
+    {
+      "frontend": "lib/browser/openforge-frontend-module"
+    }
+  ],
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test tests/*.test.cjs",
+    "check": "npm test"
+  },
+  "dependencies": {
+    "@theia/core": "1.75.0",
+    "@theia/workspace": "1.75.0",
+    "@theia/filesystem": "1.75.0",
+    "@theia/editor": "1.75.0",
+    "@theia/ai-core": "1.75.0",
+    "@theia/ai-chat": "1.75.0",
+    "@theia/navigator": "1.75.0",
+    "@theia/mini-browser": "1.75.0",
+    "@theia/ai-ide": "1.75.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

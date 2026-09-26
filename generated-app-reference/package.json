@@ -1,0 +1,48 @@
+{
+  "name": "openforge-notes",
+  "version": "1.0.0",
+  "private": true,
+  "main": "electron-main.cjs",
+  "scripts": {
+    "test": "node --test",
+    "build": "node --check app.js",
+    "package": "electron-builder --win nsis --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "38.0.0",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "studio.openforge.generated",
+    "productName": "OpenForge Notes",
+    "artifactName": "OpenForge-Generated-Setup-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "asar": true,
+    "files": [
+      "**/*",
+      "!dist/**/*",
+      "!tests/**/*",
+      "!node_modules/.cache/**/*",
+      "!requirements-traceability.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false
+    }
+  }
+}

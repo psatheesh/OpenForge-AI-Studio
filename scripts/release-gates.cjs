@@ -1,0 +1,24 @@
+'use strict';
+/** Structural checks only. Never equate source checks with Windows production verification. */
+const fs=require('node:fs'),path=require('node:path');
+const base=path.resolve(__dirname,'..');
+const exists=p=>fs.existsSync(path.join(base,p));
+const root=require('../package.json');
+const desktop=require('../applications/desktop/package.json');
+const browser=require('../applications/browser/package.json');
+const required=['installer/windows/build-installer.ps1','installer/windows/smoke-installer.ps1','installer/windows/verify-production.ps1','scripts/electron-entry.cjs','scripts/first-run.cjs','electron-builder.yml'];
+const release={version:root.version,checkedAt:new Date().toISOString(),checks:[],productionReady:false};
+const check=(id,passed,detail)=>release.checks.push({id,passed,detail});
+for(const f of required)check('exists:'+f,exists(f),f);
+const packages=Object.keys(desktop.dependencies).filter(x=>x.startsWith('@theia/'));
+check('theia-version-consistency',packages.every(x=>desktop.dependencies[x]==='1.75.0')&&Object.entries(browser.dependencies).filter(([x])=>x.startsWith('@theia/')).every(([x,v])=>v==='1.75.0'),`${packages.length} desktop Theia packages checked`);
+check('one-click-nsis',/oneClick:\s*true/.test(fs.readFileSync(path.join(base,'electron-builder.yml'),'utf8')),'NSIS oneClick enabled');
+check('pinned-dependency-lockfile',exists('yarn.lock'),'Reproducible dependency lockfile must be committed');
+check('native-theia-windows-build-evidence',exists('release-evidence/windows-native-build.json'),'Native Windows build needs real evidence');
+check('clean-windows-installer-evidence',exists('release-evidence/windows-clean-install.json'),'Clean Windows installation evidence required');
+check('windows-ui-e2e-evidence',exists('release-evidence/windows-ui-e2e.json'),'Real Theia/AI Builder browser/electron E2E required');
+check('independent-security-evidence',exists('release-evidence/security-review.json'),'Independent security assessment evidence required');
+check('signed-installer-evidence',exists('release-evidence/windows-signing.json'),'Authenticode verification required');
+release.productionReady=release.checks.every(x=>x.passed);
+process.stdout.write(JSON.stringify(release,null,2)+'\n');
+if (process.argv.includes('--require-production') && !release.productionReady)process.exitCode=2;

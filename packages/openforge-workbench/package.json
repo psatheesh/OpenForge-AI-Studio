@@ -1,0 +1,9 @@
+{
+  "name": "openforge-ai-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-first AI prompt-to-software workbench and Eclipse Theia integration starter",
+  "engines": {"node": ">=20"},
+  "scripts": {"start": "node server.js", "test": "node --test tests/*.test.js", "check": "node --check server.js && node --check public/app.js"},
+  "license": "MIT"
+}

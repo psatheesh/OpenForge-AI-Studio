@@ -1,0 +1,16 @@
+services:
+  openforge:
+    build: .
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4343
+      OPENFORGE_TOKEN: ${OPENFORGE_TOKEN:?Set a long random token before network deployment}
+      OPENFORGE_DATA: /data
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+    ports: ["127.0.0.1:4343:4343"]
+    volumes: ["openforge-data:/data"]
+    restart: unless-stopped
+volumes:
+  openforge-data: {}
