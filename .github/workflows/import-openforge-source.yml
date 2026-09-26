@@ -13,20 +13,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Verify and extract the source archive
+      - name: Verify archive and publish source files
         shell: bash
         run: |
           set -euo pipefail
           test -f .openforge-stage/manifest.json
-          cat .openforge-stage/chunk-* > "$RUNNER_TEMP/openforge.b64"
-          base64 --decode "$RUNNER_TEMP/openforge.b64" > "$RUNNER_TEMP/openforge.tar.gz"
-          echo 'd6614e61b2db4e6c548d068c1250d614c5a2b566adba2cc8c133c1f2064ffd39  '"$RUNNER_TEMP/openforge.tar.gz" | sha256sum --check
-          if tar -tzf "$RUNNER_TEMP/openforge.tar.gz" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
-            echo "Unsafe archive entry"; exit 1
+          test "$(find .openforge-stage -maxdepth 1 -name 'part-*' | wc -l)" -eq 7
+          cat .openforge-stage/part-* > "$RUNNER_TEMP/openforge.b64"
+          base64 --decode "$RUNNER_TEMP/openforge.b64" > "$RUNNER_TEMP/openforge.tar.xz"
+          echo "b9c6a2875da83736885e92ab0e64715c03552ab56e2c494c01689116b6cc7aa0  $RUNNER_TEMP/openforge.tar.xz" | sha256sum --check
+          if tar -tJf "$RUNNER_TEMP/openforge.tar.xz" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+            echo 'Unsafe archive entry'; exit 1
           fi
-          tar -xzf "$RUNNER_TEMP/openforge.tar.gz" -C .
+          tar -xJf "$RUNNER_TEMP/openforge.tar.xz" -C .
           git rm -r .openforge-stage
           git rm .github/workflows/import-openforge-source.yml
           git add -A
-          git -c user.name='OpenForge Source Publisher' -c user.email='actions@users.noreply.github.com' commit -m 'Import complete OpenForge AI Studio v0.6.0 source' || true
+          git -c user.name='OpenForge Source Publisher' -c user.email='actions@users.noreply.github.com' commit -m 'Import complete OpenForge AI Studio v0.6.0 source'
           git push origin HEAD:main
