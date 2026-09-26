@@ -1,0 +1,69 @@
+name: Generated application Windows installer and clean-install acceptance
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'packages/openforge-workbench/pipeline/**'
+      - 'installer/windows/accept-generated-app.ps1'
+      - '.github/workflows/generated-app-acceptance.yml'
+jobs:
+  build-generated-app:
+    runs-on: windows-2022
+    timeout-minutes: 75
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Run pipeline unit and repair tests
+        shell: pwsh
+        run: node --test packages/openforge-workbench/pipeline/tests
+      - name: Generate, compile, test and package actual Windows installer
+        shell: pwsh
+        run: node packages/openforge-workbench/pipeline/cli.js sample --target windows --approve-execution --dir build/generated-acceptance-project
+      - name: Require actual setup executable and SHA256 evidence
+        shell: pwsh
+        run: |
+          $setup=Get-ChildItem build/generated-acceptance-project/files/dist -Filter 'OpenForge-Generated-Setup-*.exe' | Select-Object -First 1
+          if(-not $setup){throw 'No generated Windows installer exists'}
+          (Get-FileHash $setup.FullName -Algorithm SHA256).Hash | Set-Content build/generated-acceptance-project/files/dist/setup.sha256
+          $job=Get-Content build/generated-acceptance-project/pipeline-last-run.json -Raw | ConvertFrom-Json
+          if($job.status -ne 'awaiting-windows-acceptance'){throw 'Build pipeline failed before acceptance'}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenForge-generated-app-unsigned-installer
+          path: |
+            build/generated-acceptance-project/files/dist/OpenForge-Generated-Setup-*.exe
+            build/generated-acceptance-project/files/dist/setup.sha256
+            build/generated-acceptance-project/pipeline-last-run.json
+          if-no-files-found: error
+  clean-install-acceptance:
+    needs: build-generated-app
+    runs-on: windows-2022
+    timeout-minutes: 25
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: OpenForge-generated-app-unsigned-installer
+          path: incoming
+      - name: Install on separate fresh Windows runner; hide Node and Yarn; launch desktop app
+        shell: pwsh
+        run: |
+          $setup=Get-ChildItem incoming -Filter 'OpenForge-Generated-Setup-*.exe' -Recurse | Select-Object -First 1
+          if(-not $setup){throw 'Setup.exe missing from build artifact'}
+          ./installer/windows/accept-generated-app.ps1 -SetupPath $setup.FullName -OutputDirectory evidence
+      - name: Verify installer SHA256 and attest clean-install evidence
+        shell: pwsh
+        run: |
+          $setup=Get-ChildItem incoming -Filter 'OpenForge-Generated-Setup-*.exe' -Recurse | Select-Object -First 1
+          $job=Get-ChildItem incoming -Filter 'pipeline-last-run.json' -Recurse | Select-Object -First 1
+          node packages/openforge-workbench/pipeline/attest.cjs --job $job.FullName --evidence evidence/windows-generated-app-acceptance.json --installer $setup.FullName --out evidence/acceptance-attestation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OpenForge-generated-app-acceptance-evidence
+          path: evidence/**
+          if-no-files-found: warn
