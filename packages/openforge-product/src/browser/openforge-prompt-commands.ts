@@ -12,10 +12,10 @@ export const IMPORT_PROMPT: Command = {id: 'openforge.ai.importPrompt', label: '
 
 @injectable()
 export class OpenForgePromptCommands implements CommandContribution {
-    @inject(WorkspaceService) protected readonly workspaces: WorkspaceService;
-    @inject(EditorManager) protected readonly editors: EditorManager;
-    @inject(FileService) protected readonly files: FileService;
-    @inject(MessageService) protected readonly messages: MessageService;
+    @inject(WorkspaceService) protected readonly workspaces!: WorkspaceService;
+    @inject(EditorManager) protected readonly editors!: EditorManager;
+    @inject(FileService) protected readonly files!: FileService;
+    @inject(MessageService) protected readonly messages!: MessageService;
 
     registerCommands(commands: CommandRegistry): void {
         commands.registerCommand(NEW_PROMPT, {execute: () => this.newPrompt()});

@@ -2,7 +2,16 @@ name: OpenForge Windows one-click installer
 on:
   workflow_dispatch:
   push:
+    branches: ['main']
     tags: ['v*']
+    paths:
+      - 'packages/openforge-product/**'
+      - 'applications/**'
+      - 'installer/windows/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'electron-builder.yml'
+      - '.github/workflows/windows-installer.yml'
 jobs:
   windows-installer:
     runs-on: windows-2022

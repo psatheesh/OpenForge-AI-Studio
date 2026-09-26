@@ -3,7 +3,7 @@ import { injectable, inject } from '@theia/core/shared/inversify';
 import { ReactWidget, ApplicationShell } from '@theia/core/lib/browser';
 import { Command, CommandContribution, CommandRegistry, MessageService } from '@theia/core';
 import { WidgetManager } from '@theia/core/lib/browser/widget-manager';
-import * as React from '@theia/core/shared/react';
+import React from '@theia/core/shared/react';
 
 const OPEN_BUILDER: Command = { id: 'openforge.builder.open', label: 'OpenForge: Open AI Software Builder' };
 const OPEN_AGENT: Command = { id: 'openforge.ai.help', label: 'OpenForge: AI Agent Instructions' };
@@ -36,9 +36,9 @@ export class OpenForgeWorkbenchWidget extends ReactWidget {
 
 @injectable()
 export class OpenForgeWorkbenchContribution implements CommandContribution {
-  @inject(WidgetManager) protected readonly widgets: WidgetManager;
-  @inject(ApplicationShell) protected readonly shell: ApplicationShell;
-  @inject(MessageService) protected readonly messages: MessageService;
+  @inject(WidgetManager) protected readonly widgets!: WidgetManager;
+  @inject(ApplicationShell) protected readonly shell!: ApplicationShell;
+  @inject(MessageService) protected readonly messages!: MessageService;
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(OPEN_BUILDER, {execute: async () => {
       const widget = await this.widgets.getOrCreateWidget(OpenForgeWorkbenchWidget.ID);

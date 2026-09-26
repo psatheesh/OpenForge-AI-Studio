@@ -13,8 +13,8 @@ export const OPENFORGE_WRITE_FILE_TOOL = 'openforgeWriteProjectFile';
 
 @injectable()
 abstract class OpenForgeWorkspaceTool {
-    @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService;
-    @inject(FileService) protected readonly fileService: FileService;
+    @inject(WorkspaceService) protected readonly workspaceService!: WorkspaceService;
+    @inject(FileService) protected readonly fileService!: FileService;
 
     protected async workspaceRoot(): Promise<URI> {
         const roots = await this.workspaceService.roots;

@@ -22,8 +22,9 @@ try{
   $savedPath=$env:Path
   $env:Path="$env:SystemRoot\System32;$env:SystemRoot;$env:SystemRoot\System32\Wbem"
   Remove-Item Env:NODE_PATH,Env:NODE_OPTIONS,Env:npm_config_prefix,Env:OPENFORGE_NODE,Env:OPENFORGE_NPM_CLI -ErrorAction SilentlyContinue
-  $node=& "$env:SystemRoot\System32\where.exe" node 2>$null
-  $yarn=& "$env:SystemRoot\System32\where.exe" yarn 2>$null
+  # Get-Command avoids leaving a nonzero native $LASTEXITCODE when the runtime is absent.
+  $node=Get-Command node.exe -CommandType Application -ErrorAction SilentlyContinue
+  $yarn=Get-Command yarn.cmd -CommandType Application -ErrorAction SilentlyContinue
   if($node -or $yarn){throw 'Node or Yarn is unexpectedly discoverable on the acceptance PATH'}
   $report.tests.noDevelopmentRuntimeInPath='passed'
   $selftest=Join-Path $OutputDirectory 'packaged-selftest.json'
@@ -57,4 +58,6 @@ try{
   $report|ConvertTo-Json -Depth 8|Set-Content $out -Encoding UTF8
   Write-Host "Acceptance evidence: $out"
   if(-not $report.pass){exit 1}
+  # Explicit success is required by GitHub Actions even after earlier native probes.
+  exit 0
 }
