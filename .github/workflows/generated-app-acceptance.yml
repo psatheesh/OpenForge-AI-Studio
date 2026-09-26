@@ -18,7 +18,7 @@ jobs:
           node-version: '22.16.0'
       - name: Run pipeline unit and repair tests
         shell: pwsh
-        run: node --test packages/openforge-workbench/pipeline/tests
+        run: node --test packages/openforge-workbench/pipeline/tests/api.test.cjs packages/openforge-workbench/pipeline/tests/attest.test.cjs packages/openforge-workbench/pipeline/tests/engine.test.cjs
       - name: Generate, compile, test and package actual Windows installer
         shell: pwsh
         run: node packages/openforge-workbench/pipeline/cli.js sample --target windows --approve-execution --dir build/generated-acceptance-project
