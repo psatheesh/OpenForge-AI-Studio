@@ -8,3 +8,8 @@ test('both Theia targets ship built-in OpenForge and native AI packages',()=>{
 test('custom AI agent is a product dependency, not separate extension install',()=>{const p=load('packages/openforge-product/package.json');assert.ok(p.theiaExtensions.some(x=>x.frontend));const b=fs.readFileSync(path.join(root,'packages/openforge-product/src/browser/openforge-frontend-module.ts'),'utf8');assert.match(b,/OpenForgeWorkbenchWidget/);assert.match(b,/OpenForgeAIBuilderAgent/);});
 test('one launcher runs local builder with native IDE',()=>{const b=fs.readFileSync(path.join(root,'scripts/launch.js'),'utf8');assert.match(b,/openforge-workbench\/server\.js/);assert.match(b,/theia/);});
 test('Theia versions are pinned consistently',()=>{for(const name of ['browser','desktop'])for(const [dep,version] of Object.entries(load(`applications/${name}/package.json`).dependencies))if(dep.startsWith('@theia/'))assert.equal(version,'1.75.0');});
+
+test('Theia 1.75 Electron peer version is pinned in both build roots',()=>{
+ assert.equal(load('package.json').devDependencies.electron,'42.8.1');
+ assert.equal(load('applications/desktop/package.json').devDependencies.electron,'42.8.1');
+});
